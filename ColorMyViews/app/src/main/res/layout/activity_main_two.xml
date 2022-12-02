@@ -5,7 +5,8 @@
     android:id="@+id/constraint_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/default_margin"
+    android:paddingTop="@dimen/default_padding"
+    android:paddingBottom="@dimen/default_padding"
     tools:context=".MainActivity">
 
     <TextView
@@ -140,12 +141,11 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/mainConstraintLayout"
-        android:layout_width="0dp"
+        android:layout_width="100dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/blue_button"
         app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/info_text"
         app:layout_constraintVertical_bias="0.5">
 

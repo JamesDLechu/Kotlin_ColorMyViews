@@ -3,22 +3,46 @@ package com.example.colormyviews
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.transition.ChangeBounds
+import android.transition.TransitionManager
 import android.view.View
-import kotlinx.android.synthetic.main.activity_main.*
+import android.view.animation.AnticipateOvershootInterpolator
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.widget.ConstraintSet
+import com.example.colormyviews.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
+    private lateinit var constraintLayout: ConstraintLayout
+    private val startConstraints= ConstraintSet()
+    private val endConstraints= ConstraintSet()
+    private val transitionInterpolator= ChangeBounds()
+    private var initialState= true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+
+        binding= ActivityMainBinding.inflate(layoutInflater)
+        val root= binding.root
+        setContentView(root)
+
+        constraintLayout= binding.constraintLayout
+        startConstraints.clone(constraintLayout)
+        transitionInterpolator.interpolator= AnticipateOvershootInterpolator(2.0f)
+        endConstraints.load(this, R.layout.activity_main_two)
 
         setListeners()
     }
 
     private fun setListeners(){
-        val clickableViews: List<View> =
-            listOf(box_one_text, box_two_text, box_three_text,
-                box_four_text, box_five_text, constraint_layout, red_button,
-                green_button, yellow_button)
+        val clickableViews: List<View>
+        binding.apply {
+         clickableViews =
+            listOf(boxOneText, boxTwoText, boxThreeText,
+                boxFourText, boxFiveText, constraintLayout, redButton,
+                blueButton, yellowButton)
+        }
 
         for (view in clickableViews){
             view.setOnClickListener { makeColored(it) }
@@ -38,11 +62,23 @@ class MainActivity : AppCompatActivity() {
             R.id.box_five_text -> view.setBackgroundResource(android.R.color.holo_green_light)
 
             // Boxes using custom colors for background
-            R.id.red_button -> box_three_text.setBackgroundResource(R.color.my_red)
-            R.id.yellow_button -> box_four_text.setBackgroundResource(R.color.my_yellow)
-            R.id.green_button -> box_five_text.setBackgroundResource(R.color.my_green)
+            R.id.red_button -> binding.boxThreeText.setBackgroundResource(R.color.my_red)
+            R.id.yellow_button -> changeSquareSize()
+            //R.id.blue_button -> box_five_text.setBackgroundResource(R.color.my_green)
+            R.id.blue_button -> changeSquareSize(bounce = true)
 
             else -> view.setBackgroundColor(Color.LTGRAY)
         }
+    }
+
+    private fun changeSquareSize(bounce: Boolean= false) {
+        val currentConstraints= if( initialState ) endConstraints else startConstraints
+        initialState= !initialState
+
+        if(bounce)
+            TransitionManager.beginDelayedTransition(constraintLayout, transitionInterpolator)
+        else
+            TransitionManager.beginDelayedTransition(constraintLayout)
+        currentConstraints.applyTo(constraintLayout)
     }
 }
